@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Purchase History - ValuVault{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">
+                <i class="fas fa-receipt text-primary"></i>
+                Purchase History
+            </h1>
+            
+            {% if purchases %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Item</th>
+                                <th>Collection</th>
+                                <th>Price Paid</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for purchase in purchases %}
+                                <tr>
+                                    <td>
+                                        <i class="fas fa-calendar"></i> 
+                                        {{ purchase.purchase_date|date:"M d, Y H:i" }}
+                                    </td>
+                                    <td>
+                                        <strong>{{ purchase.item.name }}</strong>
+                                    </td>
+                                    <td>{{ purchase.item.collection.name }}</td>
+                                    <td>
+                                        <span class="badge bg-info">${{ purchase.price_paid }}</span>
+                                    </td>
+                                    <td>
+                                        {% if purchase.status == 'completed' %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check-circle"></i> Completed
+                                            </span>
+                                        {% elif purchase.status == 'pending' %}
+                                            <span class="badge bg-warning">
+                                                <i class="fas fa-clock"></i> Pending
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-times-circle"></i> Cancelled
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle"></i> You haven't made any purchases yet.
+                </div>
+                <p>
+                    <a href="{% url 'auction_list' %}" class="btn btn-primary">
+                        <i class="fas fa-gavel"></i> Start Shopping
+                    </a>
+                </p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .badge {
+        font-size: 0.9rem;
+        padding: 0.5rem 0.75rem;
+    }
+</style>
+{% endblock %}

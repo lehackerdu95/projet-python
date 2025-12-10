@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Purchase Successful - ValuVault{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="alert alert-success alert-lg text-center" role="alert">
+                <i class="fas fa-check-circle fa-3x mb-3" style="color: #28a745;"></i>
+                <h1 class="alert-heading">Purchase Successful!</h1>
+                <p>Thank you for your purchase. Your order has been confirmed.</p>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Recent Purchases</h5>
+                </div>
+                <div class="card-body">
+                    {% if purchases %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Price</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for purchase in purchases %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ purchase.item.name }}</strong><br>
+                                                <small class="text-muted">{{ purchase.item.collection.name }}</small>
+                                            </td>
+                                            <td>${{ purchase.price_paid }}</td>
+                                            <td>{{ purchase.purchase_date|date:"M d, Y H:i" }}</td>
+                                            <td>
+                                                <span class="badge bg-success">{{ purchase.get_status_display }}</span>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <a href="{% url 'home' %}" class="btn btn-primary me-2">
+                    <i class="fas fa-home"></i> Back to Dashboard
+                </a>
+                <a href="{% url 'auction_list' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-gavel"></i> Browse Auctions
+                </a>
+                <a href="{% url 'purchase_history' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-history"></i> Purchase History
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .alert-lg {
+        padding: 2rem;
+        border-radius: 0.5rem;
+    }
+</style>
+{% endblock %}

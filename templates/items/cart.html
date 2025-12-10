@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}Shopping Cart - ValuVault{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">
+                <i class="fas fa-shopping-cart text-primary"></i>
+                Shopping Cart
+            </h1>
+            
+            {% if cart.items.all %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Item</th>
+                                <th>Collection</th>
+                                <th>Price</th>
+                                <th>Condition</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in cart.items.all %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ item.name }}</strong>
+                                    </td>
+                                    <td>{{ item.collection.name }}</td>
+                                    <td>
+                                        <span class="badge bg-primary">${{ item.sale_price }}</span>
+                                    </td>
+                                    <td>{{ item.get_condition_display }}</td>
+                                    <td>
+                                        <a href="{% url 'remove_from_cart' item.pk %}" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash"></i> Remove
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <a href="{% url 'auction_list' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-gavel"></i> Browse Auctions
+                        </a>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <div class="card bg-light border-primary">
+                            <div class="card-body">
+                                <h5 class="card-title">Summary</h5>
+                                <p class="card-text">
+                                    <strong>Items:</strong> {{ item_count }}<br>
+                                    <strong>Total:</strong> <span class="text-primary">${{ total_price }}</span>
+                                </p>
+                                <a href="{% url 'checkout' %}" class="btn btn-primary btn-lg w-100">
+                                    <i class="fas fa-credit-card"></i> Proceed to Checkout
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle"></i> Your cart is empty.
+                </div>
+                <p>
+                    <a href="{% url 'auction_list' %}" class="btn btn-primary">
+                        <i class="fas fa-gavel"></i> Browse Items for Sale
+                    </a>
+                </p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .badge {
+        font-size: 0.95rem;
+        padding: 0.5rem 0.75rem;
+    }
+</style>
+{% endblock %}

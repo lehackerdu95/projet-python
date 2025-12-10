@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}Marketplace - ValuVault{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-5">
+        <div class="col-md-12">
+            <h1 class="mb-4">
+                <i class="fas fa-store text-primary"></i>
+                Marketplace
+            </h1>
+            
+            <!-- Search Bar -->
+            <form method="get" class="mb-4">
+                <div class="input-group input-group-lg">
+                    <input type="text" class="form-control" name="q" placeholder="Search items, collections..." 
+                           value="{{ search_query }}">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                    {% if search_query %}
+                        <a href="{% url 'marketplace' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Clear
+                        </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    {% if items %}
+        <div class="row">
+            {% for item in items %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <!-- Item Image -->
+                        {% if item.image %}
+                            <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}" 
+                                 style="height: 250px; object-fit: cover;">
+                        {% else %}
+                            <div class="bg-light d-flex align-items-center justify-content-center" 
+                                 style="height: 250px;">
+                                <i class="fas fa-image fa-4x text-muted"></i>
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Card Body -->
+                        <div class="card-body">
+                            <h5 class="card-title">{{ item.name }}</h5>
+                            
+                            <p class="card-text text-muted small">
+                                <i class="fas fa-folder"></i> 
+                                <strong>{{ item.collection.name }}</strong>
+                            </p>
+                            
+                            {% if item.description %}
+                                <p class="card-text small">{{ item.description|truncatewords:15 }}</p>
+                            {% endif %}
+                            
+                            <div class="mb-3">
+                                <small class="text-muted">Condition</small>
+                                <div>
+                                    <span class="badge {% if item.condition == 'excellent' %}bg-success
+                                                        {% elif item.condition == 'good' %}bg-info
+                                                        {% elif item.condition == 'fair' %}bg-warning
+                                                        {% else %}bg-danger{% endif %}">
+                                        <i class="fas fa-star"></i> {{ item.get_condition_display }}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <small class="text-muted">Original Value</small>
+                                <div class="text-muted">€{{ item.value }}</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Footer with Price and Button -->
+                        <div class="card-footer bg-white border-top">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <small class="text-muted">Asking Price</small>
+                                    <div class="h5 text-primary mb-0">€{{ item.sale_price }}</div>
+                                </div>
+                                <small class="text-muted">
+                                    <i class="fas fa-user"></i> {{ item.collection.owner.username }}
+                                </small>
+                            </div>
+                            
+                            <a href="{% url 'add_to_cart' item.pk %}" class="btn btn-primary btn-sm w-100">
+                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info alert-lg text-center" role="alert">
+            <i class="fas fa-inbox fa-3x mb-3"></i>
+            <h4>No items for sale</h4>
+            <p class="mb-0">
+                {% if search_query %}
+                    No items match your search. Try a different query.
+                {% else %}
+                    No items are currently for sale on the marketplace. Check back later!
+                {% endif %}
+            </p>
+        </div>
+    {% endif %}
+    
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+            <a href="{% url 'view_cart' %}" class="btn btn-outline-primary">
+                <i class="fas fa-shopping-cart"></i> View Cart
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border: none;
+        border-radius: 0.5rem;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    .card-img-top {
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .alert-lg {
+        padding: 3rem;
+    }
+    
+    .badge {
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}

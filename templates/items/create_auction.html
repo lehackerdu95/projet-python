@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Auction - {{ item.name }} - ValuVault{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="mb-4">
+                <i class="fas fa-gavel text-primary"></i>
+                Create Auction
+            </h1>
+            
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Item Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            {% if item.image %}
+                                <img src="{{ item.image.url }}" alt="{{ item.name }}" 
+                                     style="width: 100%; height: auto; border-radius: 0.25rem;">
+                            {% else %}
+                                <div class="bg-light d-flex align-items-center justify-content-center" 
+                                     style="height: 200px; border-radius: 0.25rem;">
+                                    <i class="fas fa-image fa-3x text-muted"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-8">
+                            <h3>{{ item.name }}</h3>
+                            <p class="text-muted">
+                                <strong>Collection:</strong> {{ item.collection.name }}
+                            </p>
+                            <p>{{ item.description }}</p>
+                            <p>
+                                <strong>Condition:</strong> 
+                                <span class="badge bg-info">{{ item.get_condition_display }}</span>
+                            </p>
+                            <p>
+                                <strong>Original Value:</strong> 
+                                <span class="badge bg-secondary">${{ item.value }}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Auction Details</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="starting_price" class="form-label">
+                                Starting Price <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control form-control-lg" id="starting_price" 
+                                       name="starting_price" placeholder="0.00" step="0.01" required>
+                            </div>
+                            <small class="form-text text-muted">
+                                This is the minimum bid amount to start the auction.
+                            </small>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="duration_days" class="form-label">
+                                Auction Duration <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-control form-control-lg" id="duration_days" name="duration_days" required>
+                                <option value="">Select duration...</option>
+                                <option value="1">1 Day</option>
+                                <option value="3">3 Days</option>
+                                <option value="7" selected>7 Days</option>
+                                <option value="14">14 Days</option>
+                                <option value="30">30 Days</option>
+                            </select>
+                            <small class="form-text text-muted">
+                                The auction will automatically end after this period.
+                            </small>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-gavel"></i> Create Auction
+                            </button>
+                            <a href="{% url 'collection_detail' item.collection.pk %}" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-arrow-left"></i> Back
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="alert alert-info mt-4" role="alert">
+                <i class="fas fa-lightbulb"></i> 
+                <strong>Tip:</strong> Set a reasonable starting price to attract bidders. Higher starting prices may 
+                result in fewer bids.
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .form-control-lg {
+        font-size: 1.1rem;
+    }
+    
+    .input-group-text {
+        font-weight: bold;
+    }
+</style>
+{% endblock %}

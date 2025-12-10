@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Switch Account - ValuVault{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card mt-4 mb-5">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="mb-3">
+                            <i class="fas fa-exchange-alt" style="font-size: 3rem; color: var(--primary);"></i>
+                        </div>
+                        <h2 class="card-title">Switch Account</h2>
+                        <p class="text-muted">Select an account to switch to</p>
+                    </div>
+                    
+                    <hr>
+                    
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                <i class="fas fa-check-circle"></i> {{ message }}
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <div class="row g-3">
+                        {% for user in all_users %}
+                            <div class="col-md-6">
+                                <div class="card h-100" style="border: 2px solid {% if user.id == current_user.id %}var(--primary){% else %}var(--border-color){% endif %}; background: var(--dark-bg-secondary);">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div>
+                                                <i class="fas fa-user-circle" style="font-size: 2.5rem; color: var(--primary);"></i>
+                                            </div>
+                                            <div class="ms-3 flex-grow-1">
+                                                <h5 class="card-title mb-0">{{ user.username }}</h5>
+                                                <small class="text-muted">{{ user.get_full_name|default:"(No name)" }}</small>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-3 small">
+                                            <p class="mb-1"><strong>Email:</strong> {{ user.email }}</p>
+                                            <p class="mb-1"><strong>Status:</strong> 
+                                                {% if user.is_active %}
+                                                    <span class="badge bg-success">Active</span>
+                                                {% else %}
+                                                    <span class="badge bg-danger">Inactive</span>
+                                                {% endif %}
+                                            </p>
+                                            <p class="mb-0"><strong>Role:</strong>
+                                                {% if user.is_superuser %}
+                                                    <span class="badge bg-danger">Admin</span>
+                                                {% elif user.is_staff %}
+                                                    <span class="badge bg-warning">Staff</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">User</span>
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                        
+                                        {% if user.id == current_user.id %}
+                                            <div class="alert alert-info mb-0">
+                                                <i class="fas fa-check-circle"></i> Currently logged in
+                                            </div>
+                                        {% else %}
+                                            <a href="{% url 'switch_account_to' user.id %}" class="btn btn-primary btn-sm w-100">
+                                                <i class="fas fa-sign-in-alt"></i> Switch to this account
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i> No accounts available.
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'home' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

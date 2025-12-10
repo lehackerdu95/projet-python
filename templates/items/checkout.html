@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout - ValuVault{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            <h1 class="mb-4">
+                <i class="fas fa-credit-card text-primary"></i>
+                Checkout
+            </h1>
+            
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <tbody>
+                            {% for item in cart.items.all %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ item.name }}</strong><br>
+                                        <small class="text-muted">{{ item.collection.name }}</small>
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="badge bg-info">${{ item.sale_price }}</span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Shipping Information</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        <i class="fas fa-truck"></i> Shipping will be arranged after purchase.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Order Total</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Subtotal:</span>
+                        <strong>${{ total_price }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Shipping:</span>
+                        <strong>Free</strong>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-4">
+                        <span class="h5 mb-0">Total:</span>
+                        <strong class="h5 text-primary mb-0">${{ total_price }}</strong>
+                    </div>
+                    
+                    <form method="post" class="mb-3">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="fas fa-check-circle"></i> Complete Purchase
+                        </button>
+                    </form>
+                    
+                    <a href="{% url 'view_cart' %}" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-arrow-left"></i> Back to Cart
+                    </a>
+                </div>
+            </div>
+            
+            <div class="alert alert-info mt-4" role="alert">
+                <i class="fas fa-lock"></i> Your transaction is secure.
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .badge {
+        font-size: 0.95rem;
+    }
+</style>
+{% endblock %}
