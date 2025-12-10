@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}New{% endif %} Item - ValuVault{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light border-bottom">
+                    <h3 class="mb-0">
+                        <i class="fas fa-{% if form.instance.pk %}edit{% else %}plus{% endif %}"></i>
+                        {% if form.instance.pk %}Edit Item{% else %}Add New Item to Collection{% endif %}
+                    </h3>
+                </div>
+                
+                <div class="card-body">
+                    {% if collection %}
+                    <div class="alert alert-info alert-sm mb-4">
+                        <i class="fas fa-folder"></i>
+                        <strong>Collection:</strong> {{ collection.name }}
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post" enctype="multipart/form-data" class="needs-validation">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="id_name" class="form-label">
+                                <i class="fas fa-tag"></i> Item Name <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="fas fa-box"></i>
+                                </span>
+                                {{ form.name }}
+                            </div>
+                            {% if form.name.errors %}
+                                <div class="alert alert-danger alert-sm mt-2 mb-0">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    {{ form.name.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_description" class="form-label">
+                                <i class="fas fa-align-left"></i> Description
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0" style="align-self: flex-start; padding-top: 0.6rem;">
+                                    <i class="fas fa-file-alt"></i>
+                                </span>
+                                {{ form.description }}
+                            </div>
+                            {% if form.description.errors %}
+                                <div class="alert alert-danger alert-sm mt-2 mb-0">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    {{ form.description.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_value" class="form-label">
+                                    <i class="fas fa-euro-sign"></i> Value <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="fas fa-coins"></i>
+                                    </span>
+                                    {{ form.value }}
+                                </div>
+                                {% if form.value.errors %}
+                                    <div class="alert alert-danger alert-sm mt-2 mb-0">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        {{ form.value.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="id_condition" class="form-label">
+                                    <i class="fas fa-star"></i> Condition
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="fas fa-check-circle"></i>
+                                    </span>
+                                    {{ form.condition }}
+                                </div>
+                                {% if form.condition.errors %}
+                                    <div class="alert alert-danger alert-sm mt-2 mb-0">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        {{ form.condition.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_acquisition_date" class="form-label">
+                                <i class="fas fa-calendar"></i> Acquisition Date
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="fas fa-clock"></i>
+                                </span>
+                                {{ form.acquisition_date }}
+                            </div>
+                            {% if form.acquisition_date.errors %}
+                                <div class="alert alert-danger alert-sm mt-2 mb-0">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    {{ form.acquisition_date.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="id_image" class="form-label">
+                                <i class="fas fa-image"></i> Item Image
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="fas fa-photo-video"></i>
+                                </span>
+                                {{ form.image }}
+                            </div>
+                            <small class="text-muted d-block mt-2">
+                                <i class="fas fa-info-circle"></i> Optional: Upload an image of the item
+                            </small>
+                            {% if form.image.errors %}
+                                <div class="alert alert-danger alert-sm mt-2 mb-0">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    {{ form.image.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- E-commerce Section -->
+                        <hr class="my-4">
+                        <h5 class="mb-3"><i class="fas fa-shopping-cart"></i> Sales Options</h5>
+                        
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="id_is_for_sale" name="is_for_sale" {% if form.instance.is_for_sale %}checked{% endif %}>
+                                <label class="form-check-label" for="id_is_for_sale">
+                                    <i class="fas fa-tag"></i> This item is for sale
+                                </label>
+                            </div>
+                            <small class="text-muted d-block mt-2">
+                                <i class="fas fa-info-circle"></i> Enable this to allow users to purchase this item
+                            </small>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="id_sale_price" class="form-label">
+                                <i class="fas fa-dollar-sign"></i> Sale Price
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="fas fa-coins"></i>
+                                </span>
+                                {{ form.sale_price }}
+                            </div>
+                            <small class="text-muted d-block mt-2">
+                                <i class="fas fa-info-circle"></i> Set the price if this item is for sale
+                            </small>
+                            {% if form.sale_price.errors %}
+                                <div class="alert alert-danger alert-sm mt-2 mb-0">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    {{ form.sale_price.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-flex gap-2 pt-3">
+                            <button type="submit" class="btn btn-primary flex-grow-1">
+                                <i class="fas fa-{% if form.instance.pk %}sync{% else %}plus{% endif %}"></i>
+                                {% if form.instance.pk %}Update Item{% else %}Add Item{% endif %}
+                            </button>
+                            {% if collection %}
+                            <a href="{% url 'collection_detail' collection.pk %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            {% else %}
+                            <a href="{% url 'collection_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .input-group-text {
+        border: 1px solid var(--border-color);
+        color: var(--primary);
+    }
+    
+    .alert-sm {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+    }
+    
+    .form-control, .form-select, textarea {
+        border: 1px solid var(--border-color);
+    }
+    
+    .form-control:focus, .form-select:focus, textarea:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 0.2rem rgba(15, 52, 96, 0.25);
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}{{ collection.name }} - ValuVault{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h2><i class="fas fa-folder-open"></i> {{ collection.name }}</h2>
+            <p class="text-muted lead">{{ collection.description }}</p>
+        </div>
+        <div class="btn-group" role="group">
+            <a href="{% url 'collection_update' collection.pk %}" class="btn btn-primary">
+                <i class="fas fa-edit"></i> Edit Collection
+            </a>
+            <a href="{% url 'item_create' collection.pk %}" class="btn btn-success">
+                <i class="fas fa-plus"></i> Add Item
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-5">
+        <div class="col-md-6 col-lg-3">
+            <div class="stats-card">
+                <h3><i class="fas fa-box"></i> {{ collection.get_item_count }}</h3>
+                <p>Total Items</p>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="stats-card">
+                <h3><i class="fas fa-euro-sign"></i> {{ collection.get_total_value }}</h3>
+                <p>Total Value</p>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="stats-card">
+                <h3><i class="fas fa-calendar"></i> {{ collection.created_at|date:"d/m" }}</h3>
+                <p>Created {{ collection.created_at|date:"Y" }}</p>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="stats-card">
+                <h3><i class="fas fa-sync"></i> {{ collection.updated_at|date:"d/m" }}</h3>
+                <p>Updated {{ collection.updated_at|date:"Y" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-5">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="fas fa-list"></i> Items in this collection</h5>
+        </div>
+        {% if collection.items.all %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th><i class="fas fa-tag"></i> Name</th>
+                        <th><i class="fas fa-info-circle"></i> Condition</th>
+                        <th><i class="fas fa-euro-sign"></i> Value</th>
+                        <th><i class="fas fa-calendar"></i> Acquisition Date</th>
+                        <th><i class="fas fa-cogs"></i> Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in collection.items.all %}
+                    <tr class="align-middle">
+                        <td>
+                            <strong class="text-primary">{{ item.name }}</strong>
+                            {% if item.description %}
+                            <br><small class="text-muted">{{ item.description|truncatewords:10 }}</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge 
+                                {% if item.condition == 'excellent' %}bg-success
+                                {% elif item.condition == 'good' %}bg-info
+                                {% elif item.condition == 'fair' %}bg-warning
+                                {% else %}bg-danger{% endif %}">
+                                <i class="fas fa-star"></i> {{ item.get_condition_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <strong class="text-success">€{{ item.value }}</strong>
+                        </td>
+                        <td>
+                            <small class="text-muted">
+                                {% if item.acquisition_date %}
+                                    {{ item.acquisition_date|date:"M d, Y" }}
+                                {% else %}
+                                    <em>Not set</em>
+                                {% endif %}
+                            </small>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a href="{% url 'item_update' item.pk %}" class="btn btn-outline-primary" title="Edit item">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'create_auction' item.pk %}" class="btn btn-outline-success" title="Create auction">
+                                    <i class="fas fa-gavel"></i>
+                                </a>
+                                <a href="{% url 'item_delete' item.pk %}" class="btn btn-outline-danger" title="Delete item">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="card-body">
+            <div class="alert alert-info mb-0" role="alert">
+                <i class="fas fa-inbox"></i>
+                <strong>Empty collection!</strong> 
+                Add your first item to start tracking the value of your objects.
+                <a href="{% url 'item_create' collection.pk %}" class="alert-link">Add an item</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="d-flex gap-2">
+        <a href="{% url 'collection_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Collections
+        </a>
+        <a href="{% url 'collection_delete' collection.pk %}" class="btn btn-outline-danger ms-auto">
+            <i class="fas fa-trash"></i> Delete Collection
+        </a>
+    </div>
+</div>
+
+<style>
+    .table {
+        font-size: 0.95rem;
+    }
+    
+    .table tbody tr {
+        border-color: var(--border-color);
+    }
+    
+    .table tbody tr:hover {
+        background-color: var(--light-bg);
+    }
+    
+    .badge {
+        font-weight: 500;
+        padding: 0.5rem 0.75rem;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Image - {{ item.name }} - ValuVault{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card mt-5 mb-5">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="mb-3">
+                            <i class="fas fa-image" style="font-size: 3rem; color: var(--primary);"></i>
+                        </div>
+                        <h2 class="card-title">Upload Image</h2>
+                        <p class="text-muted">Add a picture for: <strong>{{ item.name }}</strong></p>
+                    </div>
+
+                    <hr>
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                <i class="fas fa-check-circle"></i> {{ message }}
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Current Image Display -->
+                    {% if item.image %}
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Current Image</label>
+                            <div style="border: 2px dashed var(--border-color); border-radius: 0.5rem; padding: 1rem; text-align: center; background: var(--dark-bg-tertiary);">
+                                <img src="{{ item.image.url }}" alt="{{ item.name }}" style="max-width: 100%; max-height: 300px; border-radius: 0.5rem;">
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info mb-4">
+                            <i class="fas fa-info-circle"></i> No image yet. Upload one to make your listing more attractive!
+                        </div>
+                    {% endif %}
+
+                    <!-- Upload Form -->
+                    <form method="post" enctype="multipart/form-data" class="mb-3">
+                        {% csrf_token %}
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Select Image</label>
+                            <div class="upload-area" style="border: 2px dashed var(--primary); border-radius: 0.5rem; padding: 2rem; text-align: center; cursor: pointer; background: rgba(0, 212, 255, 0.05); transition: all 0.3s ease;" 
+                                 onDragOver="this.style.background='rgba(0, 212, 255, 0.15)'; this.style.borderColor='var(--primary)';"
+                                 onDragLeave="this.style.background='rgba(0, 212, 255, 0.05)'; this.style.borderColor='var(--primary)';"
+                                 onDrop="document.getElementById('imageInput').click();">
+                                <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: var(--primary); display: block; margin-bottom: 1rem;"></i>
+                                <p class="mb-2"><strong>Drag and drop your image here</strong></p>
+                                <p class="text-muted mb-0">or click to browse</p>
+                            </div>
+                            <input type="file" id="imageInput" name="image" class="form-control mt-3" accept="image/*" required>
+                            <small class="form-text text-muted mt-2">
+                                Supported formats: JPG, PNG, GIF (Max 10MB)
+                            </small>
+                        </div>
+
+                        <!-- Image Preview -->
+                        <div id="imagePreview" class="mb-4" style="display: none;">
+                            <label class="form-label fw-bold">Preview</label>
+                            <div style="border: 2px solid var(--border-color); border-radius: 0.5rem; padding: 1rem; text-align: center; background: var(--dark-bg-tertiary);">
+                                <img id="previewImg" src="" alt="Preview" style="max-width: 100%; max-height: 300px; border-radius: 0.5rem;">
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-upload"></i> Upload Image
+                            </button>
+                            <a href="{% url 'item_detail' item.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+
+                    <hr>
+
+                    <!-- Item Info -->
+                    <div class="card" style="background: var(--dark-bg-tertiary); border: 1px solid var(--border-color);">
+                        <div class="card-body">
+                            <h6 class="card-title">Item Details</h6>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <small class="text-muted d-block">Item</small>
+                                    <small class="fw-bold">{{ item.name }}</small>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted d-block">Price</small>
+                                    <small class="fw-bold" style="color: var(--primary);">${{ item.sale_price }}</small>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted d-block">Collection</small>
+                                    <small class="fw-bold">{{ item.collection.name }}</small>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted d-block">Condition</small>
+                                    <small class="fw-bold">{{ item.get_condition_display }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Image preview functionality
+document.getElementById('imageInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            document.getElementById('previewImg').src = event.target.result;
+            document.getElementById('imagePreview').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// Drag and drop
+document.getElementById('imageInput').addEventListener('change', function(e) {
+    if (e.target.files.length > 0) {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            document.getElementById('previewImg').src = event.target.result;
+            document.getElementById('imagePreview').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,310 @@
+{% extends "base.html" %}
+
+{% block title %}{{ item.name }} - ValuVault{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-5">
+        <!-- Breadcrumb -->
+        <div class="col-lg-12 mb-4">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb" style="background: transparent;">
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}" style="color: var(--primary);">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'marketplace' %}" style="color: var(--primary);">Marketplace</a></li>
+                    <li class="breadcrumb-item active">{{ item.name }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row g-4 mb-5">
+        <!-- Left Column: Image & Details -->
+        <div class="col-lg-6">
+            <!-- Item Image -->
+            <div class="card" style="border: 1px solid var(--border-color); margin-bottom: 2rem; background: var(--dark-bg-secondary);">
+                <div style="position: relative; overflow: hidden; height: 450px; background: var(--dark-bg-tertiary);">
+                    {% if item.image %}
+                        <img src="{{ item.image.url }}" alt="{{ item.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    {% else %}
+                        <div class="d-flex align-items-center justify-content-center" style="width: 100%; height: 100%;">
+                            <i class="fas fa-image" style="font-size: 6rem; color: var(--border-color);"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Condition Badge -->
+                    <div style="position: absolute; top: 20px; right: 20px;">
+                        <span class="badge" style="font-size: 1rem; padding: 10px 15px; background: 
+                            {% if item.condition == 'excellent' %}#10b981
+                            {% elif item.condition == 'good' %}#3b82f6
+                            {% elif item.condition == 'fair' %}#f59e0b
+                            {% else %}#ef4444
+                            {% endif %}">
+                            {{ item.get_condition_display }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Item Info Card -->
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h1 class="h2 mb-2" style="color: var(--primary);">{{ item.name }}</h1>
+                        <p class="text-muted mb-3">in <strong>{{ item.collection.name }}</strong></p>
+                    </div>
+
+                    <!-- Price Section -->
+                    <div class="card" style="background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%); border: 2px solid var(--primary); margin-bottom: 2rem;">
+                        <div class="card-body text-center">
+                            <small class="text-muted">Asking Price</small>
+                            <h3 class="mb-0" style="color: var(--primary); font-size: 2.5rem;">
+                                <i class="fas fa-dollar-sign"></i>{{ item.sale_price }}
+                            </h3>
+                        </div>
+                    </div>
+
+                    <!-- Seller Info -->
+                    <div class="card" style="background: var(--dark-bg-tertiary); border: 1px solid var(--border-color); margin-bottom: 2rem;">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">Seller Information</h5>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-user-circle" style="color: var(--primary); font-size: 3rem; margin-right: 1rem;"></i>
+                                <div>
+                                    <h6 class="mb-1">{{ owner.username }}</h6>
+                                    <small class="text-muted">{{ owner.email }}</small>
+                                    {% if owner.first_name or owner.last_name %}
+                                        <div class="small text-muted mt-1">
+                                            {{ owner.get_full_name }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Item Description -->
+                    <div class="card" style="background: var(--dark-bg-tertiary); border: 1px solid var(--border-color);">
+                        <div class="card-body">
+                            <h5 class="card-title">Description</h5>
+                            <p class="card-text">{{ item.description|linebreaks }}</p>
+                            
+                            <hr>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <small class="text-muted d-block">Original Value</small>
+                                    <h6 style="color: var(--primary);">
+                                        <i class="fas fa-pound-sign"></i> {{ item.value }}
+                                    </h6>
+                                </div>
+                                <div class="col-md-6">
+                                    <small class="text-muted d-block">Acquisition Date</small>
+                                    <h6 style="color: var(--primary);">
+                                        {% if item.acquisition_date %}
+                                            {{ item.acquisition_date|date:"M d, Y" }}
+                                        {% else %}
+                                            Not specified
+                                        {% endif %}
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Offers & Actions -->
+        <div class="col-lg-6">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-3" role="alert">
+                        <i class="fas fa-check-circle"></i> {{ message }}
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Action Buttons -->
+            {% if not is_owner %}
+                <!-- Buy Now Button -->
+                <div class="card mb-4" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0.1) 100%); border: 2px solid #10b981;">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">
+                            <i class="fas fa-shopping-bag" style="color: #10b981;"></i> Buy Now
+                        </h5>
+                        <p class="text-muted mb-3">Purchase immediately at the asking price</p>
+                        <form method="post" class="mb-0">
+                            {% csrf_token %}
+                            <button type="submit" name="buy_now" class="btn btn-success btn-lg w-100">
+                                <i class="fas fa-check-circle"></i> Buy Now for ${{ item.sale_price }}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card mb-4" style="background: linear-gradient(135deg, var(--dark-bg-secondary) 0%, var(--dark-bg-tertiary) 100%); border: 2px solid var(--primary);">
+                    <div class="card-body">
+                        {% if user_offer %}
+                            <h5 class="card-title mb-3">
+                                <i class="fas fa-check-circle" style="color: #10b981;"></i> Your Offer
+                            </h5>
+                            <div class="alert alert-success mb-3">
+                                You have an active offer: <strong>${{ user_offer.amount }}</strong>
+                            </div>
+                        {% else %}
+                            <h5 class="card-title mb-3">
+                                <i class="fas fa-handshake" style="color: var(--primary);"></i> Make an Offer
+                            </h5>
+                        {% endif %}
+
+                        <form method="post" class="mb-3">
+                            {% csrf_token %}
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Your Offer Amount ($)</label>
+                                <input type="number" class="form-control" name="offer_amount" 
+                                    value="{% if user_offer %}{{ user_offer.amount }}{% endif %}"
+                                    placeholder="e.g., 150" min="0" step="0.01" required>
+                                <small class="form-text text-muted">Seller is asking ${{ item.sale_price }}</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Message (Optional)</label>
+                                <textarea class="form-control" name="offer_message" rows="3" 
+                                    placeholder="e.g., Willing to negotiate...">{% if user_offer %}{{ user_offer.message }}{% endif %}</textarea>
+                                <small class="form-text text-muted">Share details about your offer or request pickup information</small>
+                            </div>
+
+                            <button type="submit" name="submit_offer" class="btn btn-primary w-100 btn-lg">
+                                <i class="fas fa-paper-plane"></i> {% if user_offer %}Update{% else %}Submit{% endif %} Offer
+                            </button>
+                        </form>
+
+                        {% if user_offer %}
+                            <button type="button" class="btn btn-outline-danger w-100 btn-sm" onclick="document.getElementById('withdraw-offer').style.display='block'">
+                                <i class="fas fa-times"></i> Withdraw Offer
+                            </button>
+                            <div id="withdraw-offer" style="display: none; margin-top: 1rem;">
+                                <p class="text-muted mb-2">Are you sure? You can always submit a new offer later.</p>
+                                <a href="#" class="btn btn-outline-danger btn-sm w-100">Confirm Withdrawal</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% else %}
+                <!-- Owner View -->
+                <div class="card mb-4" style="background: linear-gradient(135deg, var(--dark-bg-secondary) 0%, var(--dark-bg-tertiary) 100%); border: 2px solid var(--primary);">
+                    <div class="card-body">
+                        <div class="alert alert-info mb-3">
+                            <i class="fas fa-info-circle"></i> This is your item. You cannot make an offer on your own listing.
+                        </div>
+                        <div class="d-grid gap-2">
+                            {% if not item.image %}
+                                <a href="{% url 'upload_item_image' item.pk %}" class="btn btn-warning">
+                                    <i class="fas fa-image"></i> Add Image
+                                </a>
+                            {% else %}
+                                <a href="{% url 'upload_item_image' item.pk %}" class="btn btn-info">
+                                    <i class="fas fa-refresh"></i> Change Image
+                                </a>
+                            {% endif %}
+                            <a href="{% url 'item_update' item.pk %}" class="btn btn-primary">
+                                <i class="fas fa-edit"></i> Edit Listing
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Offers List -->
+            <div class="card" style="border: 1px solid var(--border-color);">
+                <div class="card-header" style="background: var(--dark-bg-tertiary); border-bottom: 1px solid var(--border-color);">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list"></i> 
+                        {% if offers %}
+                            Offers ({{ offers.count }})
+                        {% else %}
+                            No Offers Yet
+                        {% endif %}
+                    </h5>
+                </div>
+                
+                <div class="card-body">
+                    {% if offers %}
+                        {% for offer in offers %}
+                            <div class="card mb-3" style="background: var(--dark-bg-tertiary); border: 1px solid var(--border-color);">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <h6 class="mb-0">
+                                                <i class="fas fa-user-circle" style="color: var(--primary);"></i>
+                                                {{ offer.buyer.username }}
+                                            </h6>
+                                            <small class="text-muted">{{ offer.created_at|date:"M d, Y - H:i" }}</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <h5 style="color: var(--primary); margin-bottom: 0;">
+                                                ${{ offer.amount }}
+                                            </h5>
+                                            <span class="badge" style="background: 
+                                                {% if offer.status == 'accepted' %}#10b981
+                                                {% elif offer.status == 'rejected' %}#ef4444
+                                                {% elif offer.status == 'withdrawn' %}#6b7280
+                                                {% else %}#f59e0b
+                                                {% endif %}">
+                                                {{ offer.get_status_display }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {% if offer.message %}
+                                        <p class="card-text small text-muted mb-3" style="font-style: italic;">
+                                            "{{ offer.message }}"
+                                        </p>
+                                    {% endif %}
+
+                                    <!-- Owner Actions -->
+                                    {% if is_owner and offer.status == 'pending' %}
+                                        <div class="d-grid gap-2">
+                                            <a href="{% url 'accept_offer' offer.id %}" class="btn btn-success btn-sm">
+                                                <i class="fas fa-check"></i> Accept Offer
+                                            </a>
+                                            <a href="{% url 'reject_offer' offer.id %}" class="btn btn-danger btn-sm">
+                                                <i class="fas fa-times"></i> Reject Offer
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-inbox" style="font-size: 2rem; color: var(--border-color); margin-bottom: 1rem;"></i>
+                            <p class="text-muted">No offers yet. Be the first!</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Marketplace -->
+    <div class="row">
+        <div class="col-lg-12">
+            <a href="{% url 'marketplace' %}" class="btn btn-secondary btn-lg">
+                <i class="fas fa-arrow-left"></i> Back to Marketplace
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .breadcrumb-item.active {
+        color: var(--primary);
+    }
+    
+    .card {
+        transition: all 0.3s ease;
+    }
+</style>
+{% endblock %}
